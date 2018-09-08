@@ -53,7 +53,7 @@ body {
 }
 
 .item button:hover {
-    box-shadow: 0px 1px 2px -1px rgba(176, 176, 176, 1);    
+    box-shadow: 0px 1px 2px -1px rgba(176, 176, 176, 1); 
 }
 
 .gris {
