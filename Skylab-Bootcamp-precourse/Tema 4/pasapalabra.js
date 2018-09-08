@@ -39,7 +39,7 @@ class Pasapalabra {
         this.questions = questions;
         this.corrects = [];
         this.elements = [];
-        this.style = '';
+        this.failed = [];
         this.number = 1;
     }
 
@@ -61,11 +61,7 @@ class Pasapalabra {
             this.markAsAnswered();
             this.corrects.push(this.lettreAnswer());
 
-        } else if (answer === '' || answer === 'pasapalabra') {
-
-            // ...
-
-        } else if (answer === 'end') {
+        }  else if (answer === 'end') {
 
             return this.gameOver(false);
 
@@ -133,7 +129,7 @@ class Pasapalabra {
     }
 
     answer() {
-        // ...
+        // ... get user response with prompt 
     }
 
     sum(a, b) {
