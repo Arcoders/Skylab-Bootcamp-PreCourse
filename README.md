@@ -25,4 +25,4 @@ Así, los objetivos del pre-curso son:
 
 [**Project: Calculator**]
 
-<img src="https://i.imgur.com/mvEljwX.png" alt="Calculator">
+<img src="https://i.imgur.com/roG871P.png" alt="Calculator">
