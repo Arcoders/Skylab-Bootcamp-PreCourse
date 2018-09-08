@@ -229,7 +229,6 @@ class Pasapalabra {
 
     sum(a, b) {
          return (a.corrects.length - a.failed.length) - (b.corrects.length - b.failed.length) - (a.time - b.time);
-        //return (c !== 0) ? (a.time - b.time) : c;
     }
 
     result(data) {

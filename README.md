@@ -19,6 +19,10 @@ Así, los objetivos del pre-curso son:
 
 (Tiempo estimado: 70 horas).
 
-[**Project: Pasapalabra**](mini-proj.md)
+[**Project: Pasapalabra**]
 
 <img src="https://i.imgur.com/yt65jg9.png" alt="Pasapalabra">
+
+[**Project: Calculator**]
+
+<img src="https://i.imgur.com/mvEljwX.png" alt="Calculator">
