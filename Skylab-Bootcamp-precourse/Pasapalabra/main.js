@@ -49,8 +49,8 @@ class Pasapalabra {
         this.failed = [];
         this.style = '';
         this.number = 1;
-        this.seconds = 150;
-        this.inicialSeconds = 150;
+        this.seconds = 100;
+        this.inicialSeconds = 100;
         this.countdown = null;
     }
 
@@ -107,7 +107,7 @@ class Pasapalabra {
         this.$('answer').addEventListener("keyup", event => {
             if (event.keyCode === 13) {
                 this.$('btn').classList.add('enter');
-                setTimeout(() => this.$('btn').classList.remove('enter'), 200)
+                setTimeout(() => this.$('btn').classList.remove('enter'), 100)
                 this.next();
             };
           });
@@ -188,13 +188,11 @@ class Pasapalabra {
         this.button.addEventListener('click', () => location.reload());
 
         if (save) {
-
             this.text.innerText = 'Game over';
             let scores = this.getScore();
             scores.push(result);
             this.setScore(scores);
             this.total();
-
         } else {
             this.result(result);
             this.text.innerText = 'Your score will not stay in the ranquin';
@@ -256,7 +254,6 @@ class Pasapalabra {
                             <b class="r">${data.failed.length}</b>
                             <b class="n">${data.time} seconds</b>
                         </span>`;
-
         this.scores.innerHTML += template;
     }
 
