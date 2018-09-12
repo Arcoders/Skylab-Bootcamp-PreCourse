@@ -36,12 +36,12 @@ class Pasapalabra {
 
 
     constructor(questions) {
-        this.text = document.getElementById('dynamicQuestion');
-        this.scores = document.getElementById('scores');
-        this.welcome = document.getElementById('user');
-        this.button = document.getElementById("btn");
-        this.time = document.getElementById("time");
-        this.ul = document.getElementById('circle');
+        this.text = this.$('dynamicQuestion');
+        this.scores = this.$('scores');
+        this.welcome = this.$('user');
+        this.button = this.$("btn");
+        this.time = this.$("time");
+        this.ul = this.$('circle');
         this.questions = questions;
         this.userName = null;
         this.corrects = [];
@@ -89,19 +89,29 @@ class Pasapalabra {
             li.appendChild(document.createTextNode(q.letter));
             li.style.transform = `rotate(${rotate}deg) translate(18em) rotate(${rotate * (-1)}deg)`;
             this.ul.appendChild(li);
-            this.elements = [...document.getElementsByTagName('li')];
         });
+        this.elements = [...document.getElementsByTagName('li')];
     }
 
 
     select() {
         if (this.userName) {
             if (this.answered()) return this.next();
-            this.text.innerHTML = this.questions[this.number - 1].question;
+            this.text.innerHTML = this.questions[this.actual()].question;
             this.elements[this.number].classList.add('selected', 'shadow');
         }
     }
 
+
+    handleEnter() {
+        this.$('answer').addEventListener("keyup", event => {
+            if (event.keyCode === 13) {
+                this.$('btn').classList.add('enter');
+                setTimeout(() => this.$('btn').classList.remove('enter'), 200)
+                this.next();
+            };
+          });
+    }
 
     next() {
 
@@ -111,9 +121,9 @@ class Pasapalabra {
     }
 
     check() {
-        let answer = this.answer().toLowerCase();
+        let answer = this.format(this.answer());
 
-        if (answer === this.correctAnswer()) {
+        if (answer === this.format(questions[this.actual()].answer)) {
 
             this.style = 'correct';
             this.markAsAnswered();
@@ -191,32 +201,40 @@ class Pasapalabra {
         }
     }
 
-    correctAnswer() {
-        return questions[this.number - 1].answer.toLowerCase();
+    $(id) {
+        return document.getElementById(id);
+    }
+
+    actual() {
+        return this.number - 1;
+    }
+
+    format(text) {
+        return text.toLowerCase();
     }
 
     lettreAnswer() {
-        return questions[this.number - 1].letter;
+        return questions[this.actual()].letter;
     }
 
     markAsAnswered() {
-        return questions[this.number - 1].status = 1;
+        return questions[this.actual()].status = 1;
     }
 
     answered() {
-        return questions[this.number - 1].status === 1;
+        return questions[this.actual()].status === 1;
     }
 
     answer() {
-        return document.getElementById("answer").value;
+        return this.$('answer').value;
     }
 
     resetAnswer() {
-        return document.getElementById("answer").value = '';
+        return this.$('answer').value = '';
     }
 
     placeHolder(text) {
-        return document.getElementById("answer").setAttribute('placeholder', text);
+        return this.$('answer').setAttribute('placeholder', text);
     }
 
     getScore() {
@@ -245,6 +263,7 @@ class Pasapalabra {
 }
 
 let pasapalabra = new Pasapalabra(questions);
+pasapalabra.handleEnter();
 pasapalabra.total();
 pasapalabra.draw();
 pasapalabra.select();
