@@ -41,7 +41,6 @@ class Pasapalabra {
         this.welcome = this.$('user');
         this.button = this.$("btn");
         this.time = this.$("time");
-        this.ul = this.$('circle');
         this.questions = questions;
         this.userName = null;
         this.corrects = [];
@@ -52,9 +51,10 @@ class Pasapalabra {
         this.seconds = 100;
         this.inicialSeconds = 100;
         this.countdown = null;
+        this.gameEnd = false;
     }
 
-    total() {
+    scorePoints() {
         let scores = this.getScore();
         if (!scores) return this.setScore([]);
         this.scores.innerHTML = '';
@@ -88,7 +88,7 @@ class Pasapalabra {
             let li = document.createElement("li");
             li.appendChild(document.createTextNode(q.letter));
             li.style.transform = `rotate(${rotate}deg) translate(18em) rotate(${rotate * (-1)}deg)`;
-            this.ul.appendChild(li);
+            this.$('list').appendChild(li);
         });
         this.elements = [...document.getElementsByTagName('li')];
     }
@@ -105,23 +105,23 @@ class Pasapalabra {
 
     handleEnter() {
         this.$('answer').addEventListener("keyup", event => {
-            if (event.keyCode === 13) {
-                this.$('btn').classList.add('enter');
-                setTimeout(() => this.$('btn').classList.remove('enter'), 100)
-                this.next();
-            };
+            if (event.keyCode !== 13 || this.gameEnd) return;
+            this.$('btn').classList.add('enter');
+            setTimeout(() => this.$('btn').classList.remove('enter'), 100)
+            this.next();
           });
     }
 
     next() {
-
         if (!this.userName) return this.user();
         if (this.number <= questions.length) this.check();
-
     }
 
     check() {
+
         let answer = this.format(this.answer());
+
+        if (answer === 'end') return this.gameOver(false);
 
         if (answer === this.format(questions[this.actual()].answer)) {
 
@@ -133,46 +133,35 @@ class Pasapalabra {
 
             this.style = 'selected';
 
-        } else if (answer === 'end') {
-
-            return this.gameOver(false);
-
         } else {
-
             this.style = 'error';
             this.markAsAnswered();
             this.failed.push(this.lettreAnswer());
-
         }
 
+        this.continue();
+
+    }
+
+    continue() {
         this.elements[this.number].classList.remove('shadow');
         this.elements[this.number].classList.add(this.style);
         this.resetAnswer();
 
         this.number++;
 
-        if (this.number <= this.questions.length) {
+        if (this.number <= this.questions.length) return this.select();
 
-            this.select();
-
-        } else {
-
-            let leapt = this.questions.filter(question => question.status === 0);
-
-            if (leapt.length === 0) {
-                this.gameOver();
-            } else {
-                this.number = 1;
-                this.elements.forEach(element => element.classList.remove('selected'));
-                this.select();
-            }
-
-        }
-
+        let leapt = this.questions.filter(question => question.status === 0);
+        if (leapt.length === 0) return this.gameOver();
+        this.number = 1;
+        this.elements.forEach(element => element.classList.remove('selected'));
+        this.select();
     }
 
     gameOver(save = true) {
 
+        this.gameEnd = true;
         clearInterval(this.countdown);
 
         let result = {
@@ -182,6 +171,8 @@ class Pasapalabra {
             time: (this.seconds - this.inicialSeconds) * (-1)
         };
 
+        this.resetAnswer();
+        this.button.removeAttribute('onclick');
         this.button.innerText = 'refresh';
         this.placeHolder('click on refresh to start over');
         this.welcome.innerHTML = `Thanks ${this.userName}`;
@@ -192,7 +183,7 @@ class Pasapalabra {
             let scores = this.getScore();
             scores.push(result);
             this.setScore(scores);
-            this.total();
+            this.scorePoints();
         } else {
             this.result(result);
             this.text.innerText = 'Your score will not stay in the ranquin';
@@ -250,8 +241,7 @@ class Pasapalabra {
     result(data) {
         let template = `<span>
                             <b class="n">${data.name}</b>
-                            <b class="g">${data.corrects.length}</b>
-                            <b class="r">${data.failed.length}</b>
+                            <b class="g">${data.corrects.length}</b><b class="r">${data.failed.length}</b>
                             <b class="n">${data.time} seconds</b>
                         </span>`;
         this.scores.innerHTML += template;
@@ -261,6 +251,6 @@ class Pasapalabra {
 
 let pasapalabra = new Pasapalabra(questions);
 pasapalabra.handleEnter();
-pasapalabra.total();
+pasapalabra.scorePoints();
 pasapalabra.draw();
 pasapalabra.select();
