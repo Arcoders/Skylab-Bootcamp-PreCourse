@@ -55,7 +55,7 @@ class Pasapalabra {
     }
 
     scorePoints() {
-        let scores = this.getScore();
+        let scores = this.get().score;
         if (!scores) return this.setScore([]);
         this.scores.innerHTML = '';
         scores = scores.sort((a, b) => this.sum(a, b)).reverse().slice(0, 5);
@@ -63,7 +63,7 @@ class Pasapalabra {
     }
 
     user() {
-        this.userName = this.answer().trim();
+        this.userName = this.get().answer.trim();
         if (this.userName !== '') {
             this.timer();
             this.placeHolder('Put your answer her');
@@ -97,7 +97,7 @@ class Pasapalabra {
     select() {
         if (this.userName) {
             if (this.answered()) return this.next();
-            this.text.innerHTML = this.questions[this.actual()].question;
+            this.text.innerHTML = this.questions[this.get().actual].question;
             this.elements[this.number].classList.add('selected', 'shadow');
         }
     }
@@ -119,11 +119,12 @@ class Pasapalabra {
 
     check() {
 
-        let answer = this.format(this.answer());
+        let answer = this.format(this.get().answer);
+        let correctAnswer = this.format(questions[this.get().actual].answer);
 
         if (answer === 'end') return this.gameOver(false);
 
-        if (answer === this.format(questions[this.actual()].answer)) {
+        if (answer === correctAnswer) {
 
             this.style = 'correct';
             this.markAsAnswered();
@@ -180,7 +181,7 @@ class Pasapalabra {
 
         if (save) {
             this.text.innerText = 'Game over';
-            let scores = this.getScore();
+            let scores = this.get().score;
             scores.push(result);
             this.setScore(scores);
             this.scorePoints();
@@ -194,8 +195,12 @@ class Pasapalabra {
         return document.getElementById(id);
     }
 
-    actual() {
-        return this.number - 1;
+    get() {
+        return {
+            actual: this.number - 1,
+            answer: this.$('answer').value,
+            score: JSON.parse(localStorage.getItem('pasapalabra')),
+        }
     }
 
     format(text) {
@@ -203,19 +208,15 @@ class Pasapalabra {
     }
 
     lettreAnswer() {
-        return questions[this.actual()].letter;
+        return questions[this.get().actual].letter;
     }
 
     markAsAnswered() {
-        return questions[this.actual()].status = 1;
+        return questions[this.get().actual].status = 1;
     }
 
     answered() {
-        return questions[this.actual()].status === 1;
-    }
-
-    answer() {
-        return this.$('answer').value;
+        return questions[this.get().actual].status === 1;
     }
 
     resetAnswer() {
@@ -226,16 +227,13 @@ class Pasapalabra {
         return this.$('answer').setAttribute('placeholder', text);
     }
 
-    getScore() {
-        return JSON.parse(localStorage.getItem('pasapalabra'));
-    }
 
     setScore(data) {
         return localStorage.setItem('pasapalabra', JSON.stringify(data));
     }
 
     sum(a, b) {
-         return (a.corrects.length - a.failed.length) - (b.corrects.length - b.failed.length) - (a.time - b.time);
+         return (a.corrects.length - a.failed.length) - (b.corrects.length - b.failed.length);
     }
 
     result(data) {

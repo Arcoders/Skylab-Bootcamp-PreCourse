@@ -28,12 +28,12 @@ function pressed(key) {
         if (incompleteOperation) return;
         let TotalSigns = signs.filter(sign => operation.indexOf(sign) !== -1).length;
         if (TotalSigns === 0) return print(Math.sqrt(operation));
-        return print(eval(screen.textContent));
-    } else {
-        if (incompleteOperation && signs.includes(key)) return;
-        if (['/', '*'].includes(key) && operation.length === 0) return;
-        screen.innerText += key;
+        return print(eval(operation));
     }
+    
+    if (incompleteOperation && signs.includes(key)) return;
+    if (['/', '*'].includes(key) && operation.length === 0) return;
+    screen.innerText += key;
 
 }
 
