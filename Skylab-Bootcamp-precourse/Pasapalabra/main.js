@@ -8,11 +8,6 @@ class Pasapalabra {
 
 
     constructor(questions) {
-        this.text = this.$('dynamicQuestion');
-        this.scores = this.$('scores');
-        this.welcome = this.$('user');
-        this.button = this.$("btn");
-        this.time = this.$("time");
         this.questions = questions;
         this.userName = null;
         this.corrects = [];
@@ -29,27 +24,26 @@ class Pasapalabra {
     scorePoints() {
         let scores = this.get().score;
         if (!scores) return this.setScore([]);
-        this.scores.innerHTML = '';
+        this.$('scores').innerHTML = '';
         scores = scores.sort((a, b) => this.sum(a, b)).reverse().slice(0, 5);
         scores.forEach(score => this.result(score));
     }
 
     user() {
         this.userName = this.get().answer.trim();
-        if (this.userName !== '') {
-            this.timer();
-            this.placeHolder('Put your answer her');
-            this.welcome.innerHTML = `Welcome ${this.userName}`;
-            this.resetAnswer();
-            this.select();
-        }
+        if (this.userName === '') return;
+        this.timer();
+        this.placeHolder('Put your answer her');
+        this.$('user').innerHTML = `Welcome ${this.userName}`;
+        this.resetAnswer();
+        this.select();
     }
 
     timer() {
         this.countdown = setInterval(() => {
             this.seconds--;
-            if (this.seconds <= 30) this.time.classList.add('red');
-            this.time.innerText = `${this.seconds} Seconds`;
+            if (this.seconds <= 30) this.$("time").classList.add('red');
+            this.$("time").innerText = `${this.seconds} Seconds`;
             if (this.seconds <= 0) this.gameOver();
         }, 1000);
     }
@@ -67,11 +61,10 @@ class Pasapalabra {
 
 
     select() {
-        if (this.userName) {
-            if (this.answered()) return this.next();
-            this.text.innerHTML = this.questions[this.get().actual].question;
-            this.elements[this.number].classList.add('selected', 'shadow');
-        }
+        if (!this.userName) return;
+        if (this.answered()) return this.next();
+        this.$('dynamicQuestion').innerHTML = this.questions[this.get().actual].question;
+        this.elements[this.number].classList.add('selected', 'shadow');
     }
 
 
@@ -90,30 +83,29 @@ class Pasapalabra {
     }
 
     check() {
-
-        let answer = this.format(this.get().answer);
-        let correctAnswer = this.format(this.questions[this.get().actual].answer);
-
-        if (answer === 'end') return this.gameOver(false);
-
-        if (answer === correctAnswer) {
-
-            this.style = 'correct';
-            this.markAsAnswered();
-            this.corrects.push(this.lettreAnswer());
-
-        } else if (answer === '' || answer === 'pasapalabra') {
-
-            this.style = 'selected';
-
-        } else {
-            this.style = 'error';
-            this.markAsAnswered();
-            this.failed.push(this.lettreAnswer());
-        }
-
+        this.validate();
         this.continue();
+    }
 
+    validate() {
+        switch (this.format(this.get().answer)) {
+            case 'end':
+                this.gameOver(false);
+                break; 
+            case 'pasapalabra':
+            case '':                 
+                this.style = 'selected';
+                break; 
+            case this.format(this.questions[this.get().actual].answer):
+                this.style = 'correct';
+                this.markAsAnswered();
+                this.corrects.push(this.lettreAnswer());
+                break;  
+            default: 
+                this.style = 'error';
+                this.markAsAnswered();
+                this.failed.push(this.lettreAnswer());
+        }
     }
 
     continue() {
@@ -144,23 +136,28 @@ class Pasapalabra {
             time: (this.seconds - this.inicialSeconds) * (-1)
         };
 
-        this.resetAnswer();
-        this.button.removeAttribute('onclick');
-        this.button.innerText = 'refresh';
-        this.placeHolder('click on refresh to start over');
-        this.welcome.innerHTML = `Thanks ${this.userName}`;
-        this.button.addEventListener('click', () => location.reload());
+        this.refresh();
 
         if (save) {
-            this.text.innerText = 'Game over';
+            this.$('dynamicQuestion').innerText = 'Game over';
             let scores = this.get().score;
             scores.push(result);
             this.setScore(scores);
             this.scorePoints();
         } else {
             this.result(result);
-            this.text.innerText = 'Your score will not stay in the ranquin';
+            this.$('dynamicQuestion').innerText = 'Your score will not stay in the ranquin';
         }
+    }
+
+    refresh() {
+        this.resetAnswer();
+        this.placeHolder('click on refresh to start over');
+        this.$("btn").removeAttribute('onclick');
+        this.$("btn").innerText = 'refresh';
+        this.$('answer').disabled = true;
+        this.$('user').innerHTML = `Thanks ${this.userName}`;
+        this.$("btn").addEventListener('click', () => location.reload());
     }
 
     $(id) {
@@ -215,7 +212,7 @@ class Pasapalabra {
                             <b class="g">${data.corrects.length}</b><b class="r">${data.failed.length}</b>
                             <b class="n">${data.time} seconds</b>
                         </span>`;
-        this.scores.innerHTML += template;
+        this.$('scores').innerHTML += template;
     }
 
 }
